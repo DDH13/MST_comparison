@@ -228,6 +228,14 @@ def EdgeDensityVsTime(algorithms, representations, ITERATIONS=40, NODES=5000, IN
             for representation in representations:
                 time_taken[algorithm][representation].append(time_test(G, algorithm, representation))
     print(f" Testing Complete         ")
+    for algorithm in algorithms:
+        for representation in representations:
+            plt.plot([(i*INITIAL_EDGES)//1000 for i in range(1,ITERATIONS+1)],time_taken[algorithm][representation], label=f"{algorithm}_{representation}")
+    
+    plt.xlabel("Edges in thousands")
+    plt.ylabel("Time taken in seconds")
+    plt.legend()
+    plt.show()
 
 def NodeDensityVsTime(algorithms, representations, ITERATIONS=30, INITIAL_NODES=5000, EDGES=600000):
     time_taken = {}
@@ -242,11 +250,19 @@ def NodeDensityVsTime(algorithms, representations, ITERATIONS=30, INITIAL_NODES=
             for representation in representations:
                 time_taken[algorithm][representation].append(time_test(G, algorithm, representation))
     print(f" Testing Complete         ")
+    for algorithm in algorithms:
+        for representation in representations:
+            plt.plot([INITIAL_NODES*i//1000 for i in range(1,ITERATIONS+1)],time_taken[algorithm][representation], label=f"{algorithm}_{representation}")
+    
+    plt.xlabel("Nodes in thousands")
+    plt.ylabel("Time taken in seconds")
+    plt.legend()
+    plt.show()
 
 
 NodeDensityVsTime(["kruskals", "prims_lazy", "prims_eager"], ["adj_list"], ITERATIONS=30, INITIAL_NODES=5000, EDGES=600000)
 EdgeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_list"], ITERATIONS=40, NODES=5000, INITIAL_EDGES=5000)
-NodeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_matrix"], ITERATIONS=20, INITIAL_NODES=500, EDGES=60000)
+NodeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_matrix"], ITERATIONS=10, INITIAL_NODES=500, EDGES=60000)
 EdgeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_matrix"], ITERATIONS=20, NODES=5000, INITIAL_EDGES=5000)
 
 EdgeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_list","adj_matrix"], ITERATIONS=30, NODES=1000, INITIAL_EDGES=6000)

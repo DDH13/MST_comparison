@@ -50,7 +50,7 @@ class Graph:
 
 
 # add a random graph generator
-def randomGraph(num_of_nodes, num_of_edges, min_weight=50, max_weight=100, seed=571346343224324, directed=False):
+def randomGraph(num_of_nodes, num_of_edges, min_weight=50, max_weight=100, seed=16323467893243212243254, directed=False):
     random.seed(seed)
     g = Graph(num_of_nodes, num_of_edges, directed=directed)
 
