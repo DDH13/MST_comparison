@@ -1,14 +1,8 @@
 import math
 import helpers as h
+import matplotlib.pyplot as plt
 
-# Load the data
-G = h.randomGraph(8000, 80000, 1, 10)
-adj_list = G.get_adj_list()
-adj_matrix = G.get_adj_matrix()
-# print("Adjacency list:")
-# G.print_adj_list()
-# print("Adjacency matrix:")
-# print(G.get_adj_matrix())
+
 print("__________________________________")
 
 
@@ -114,15 +108,15 @@ def prims_eager_adj_list(G):
         marked[fnode] = True
         # add all edges from the first node to the priority queue
         for i in AL[fnode]:
-            pq.push(i[0],(fnode, i[0]), i[1])
+            pq.push(i[0], (fnode, i[0]), i[1])
         while not pq.empty():
-            node,edge,priority = pq.pop()
+            node, edge, priority = pq.pop()
             if marked[edge[1]]:
                 continue
             mst.append((edge[0], edge[1], priority))
             marked[edge[1]] = True
             for i in AL[edge[1]]:
-                pq.push(i[0],(edge[1], i[0]), i[1])
+                pq.push(i[0], (edge[1], i[0]), i[1])
     # if len(mst) != G.m_num_of_nodes - 1:
     #     print(f"Disconnected graph, {len(mst)} edges found, {G.m_num_of_nodes} nodes")
     return mst
@@ -140,16 +134,16 @@ def prims_eager_adj_matrix(G):
         # add all edges from the first node to the priority queue
         for j in range(G.m_num_of_nodes):
             if AM[fnode][j] != math.inf:
-                pq.push(j,(fnode, j), AM[fnode][j])
+                pq.push(j, (fnode, j), AM[fnode][j])
         while not pq.empty():
-            node,edge,priority = pq.pop()
+            node, edge, priority = pq.pop()
             if marked[edge[1]]:
                 continue
             mst.append((edge[0], edge[1], priority))
             marked[edge[1]] = True
             for j in range(G.m_num_of_nodes):
                 if AM[edge[1]][j] != math.inf:
-                    pq.push(j,(edge[1], j), AM[edge[1]][j])
+                    pq.push(j, (edge[1], j), AM[edge[1]][j])
     # if len(mst) != G.m_num_of_nodes - 1:
     #     print(f"Disconnected graph, {len(mst)} edges found, {G.m_num_of_nodes} nodes")
     return mst
@@ -188,7 +182,8 @@ def test(G):
 
     print("------------------------------------")
 
-def MSTFactory(G,algorithm,representation):
+
+def MSTFactory(G, algorithm, representation):
     algorithms = {
         "kruskals": {
             "adj_list": kruskals_adj_list,
@@ -204,9 +199,8 @@ def MSTFactory(G,algorithm,representation):
         }
     }
     return algorithms[algorithm][representation](G)
-
 # function to keep track of the time taken to run a function
-def time_test(*args,func=MSTFactory,show=False):
+def time_test(*args, func=MSTFactory, show=False):
     import time
     start = time.time()
     func(*args)
@@ -214,67 +208,47 @@ def time_test(*args,func=MSTFactory,show=False):
     minutes = (end - start) // 60
     seconds = (end - start) % 60
     if show:
-        print(f"{args[1]} {args[2]}  ",end="\t\t")
+        print(f"{args[1]} {args[2]}  ", end="\t\t")
         if minutes == 0:
             print(f"{round(seconds,4)} seconds")
         else:
             print(f"{minutes} minutes {round(seconds,4)} seconds")
-    return round(seconds,4)
+    return round(seconds, 4)
 
-
-def EdgeDensityVsTime(algorithms,representations, ITERATIONS=40, NODES=5000, INITIAL_EDGES=5000):
+def EdgeDensityVsTime(algorithms, representations, ITERATIONS=40, NODES=5000, INITIAL_EDGES=5000):
     time_taken = {}
     for algorithm in algorithms:
         time_taken[algorithm] = {}
         for representation in representations:
             time_taken[algorithm][representation] = []
-            for i in range(1, ITERATIONS):
-                print(f"Testing {algorithm} {representation} {i}",end="",flush=True)
-                G = h.randomGraph(NODES , INITIAL_EDGES*i, 1, 10)
-                time_taken[algorithm][representation].append(time_test(G,algorithm,representation))
-                print('\r      \r', end='', flush=True)
-            print(f"Testing Complete for {algorithm} {representation}")
-    # use matplotlib to plot the results
-    import matplotlib.pyplot as plt
-    for algorithm in algorithms:
-        for representation in representations:
-            plt.plot([(i*INITIAL_EDGES)//1000 for i in range(1,ITERATIONS)],time_taken[algorithm][representation], label=f"{algorithm}_{representation}")
-    
-    plt.xlabel("Edges in thousands")
-    plt.ylabel("Time taken in seconds")
-    plt.legend()
-    plt.show()
+    for i in range(1, ITERATIONS+1):
+        print(f" Testing iteration {i}",end="\r", flush=True)
+        G = h.randomGraph(NODES, INITIAL_EDGES*i, 1, 10)
+        for algorithm in algorithms:
+            for representation in representations:
+                time_taken[algorithm][representation].append(time_test(G, algorithm, representation))
+    print(f" Testing Complete         ")
 
-
-def NodeDensityVsTime(algorithms,representations, ITERATIONS=30, INITIAL_NODES=5000, EDGES=600000):
+def NodeDensityVsTime(algorithms, representations, ITERATIONS=30, INITIAL_NODES=5000, EDGES=600000):
     time_taken = {}
     for algorithm in algorithms:
         time_taken[algorithm] = {}
         for representation in representations:
             time_taken[algorithm][representation] = []
-            for i in range(1, ITERATIONS):
-                print(f"Testing {algorithm} {representation} {i}",end="",flush=True)
-                G = h.randomGraph(INITIAL_NODES*i , EDGES, 1, 10)
-                time_taken[algorithm][representation].append(time_test(G,algorithm,representation))
-                print('\r      \r', end='', flush=True)
-            print(f"Testing Complete for {algorithm} {representation}")
-    # use matplotlib to plot the results
-    import matplotlib.pyplot as plt
-    for algorithm in algorithms:
-        for representation in representations:
-            plt.plot([INITIAL_NODES*i//1000 for i in range(1,ITERATIONS)],time_taken[algorithm][representation], label=f"{algorithm}_{representation}")
-    
-    plt.xlabel("Nodes in thousands")
-    plt.ylabel("Time taken in seconds")
-    plt.legend()
-    plt.show()
+    for i in range(1, ITERATIONS+1):
+        print(f" Testing iteration {i}",end="\r", flush=True)
+        G = h.randomGraph(INITIAL_NODES*i, EDGES, 1, 10)
+        for algorithm in algorithms:
+            for representation in representations:
+                time_taken[algorithm][representation].append(time_test(G, algorithm, representation))
+    print(f" Testing Complete         ")
 
-NodeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_list"], ITERATIONS=30, INITIAL_NODES=5000, EDGES=600000)
+
+NodeDensityVsTime(["kruskals", "prims_lazy", "prims_eager"], ["adj_list"], ITERATIONS=30, INITIAL_NODES=5000, EDGES=600000)
 EdgeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_list"], ITERATIONS=40, NODES=5000, INITIAL_EDGES=5000)
 NodeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_matrix"], ITERATIONS=20, INITIAL_NODES=500, EDGES=60000)
 EdgeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_matrix"], ITERATIONS=20, NODES=5000, INITIAL_EDGES=5000)
 
 EdgeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_list","adj_matrix"], ITERATIONS=30, NODES=1000, INITIAL_EDGES=6000)
 NodeDensityVsTime(["kruskals","prims_lazy","prims_eager"],["adj_list","adj_matrix"], ITERATIONS=10, INITIAL_NODES=1000, EDGES=60000)
-
-
+print("------------------------------------")
