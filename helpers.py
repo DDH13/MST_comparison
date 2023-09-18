@@ -18,7 +18,11 @@ class Graph:
 
         if not self.m_directed:
             self.m_adj_list[node2].add((node1, weight))
-
+    def check_edge(self, node1, node2):
+        if node2 in self.m_adj_list[node1]:
+            return True
+        else:
+            return False
     def print_adj_list(self):
         for key in self.m_adj_list.keys():
             print("node", key, ": ", self.m_adj_list[key])
@@ -49,18 +53,30 @@ class Graph:
 def randomGraph(num_of_nodes, num_of_edges, min_weight=50, max_weight=100, seed=571346343224324, directed=False):
     random.seed(seed)
     g = Graph(num_of_nodes, num_of_edges, directed=directed)
-    for i in range(num_of_edges):
+
+    max_edges = num_of_nodes*(num_of_nodes-1) if directed else num_of_nodes*(num_of_nodes-1)//2
+    if num_of_edges > max_edges:
+        return "Error: Too many edges. Maximum number of edges for this graph is " + str(max_edges)
+
+    edge_count = 0
+    while edge_count < num_of_edges:
         u = random.randint(0, num_of_nodes - 1)
         v = random.randint(0, num_of_nodes - 1)
 
-        while u == v:
+        # check if u is connected to the entire graph
+        while len(g.get_adj_list()[u]) == num_of_nodes - 1:
+            u = random.randint(0, num_of_nodes - 1)
+
+        while u == v or g.check_edge(u, v):
             v = random.randint(0, num_of_nodes - 1)
 
-        g.add_edge(u, v, weight=random.randint(min_weight, max_weight))
+        weight = random.randint(min_weight, max_weight)
+        g.add_edge(u, v, weight=weight)
+        
+        edge_count += 1
 
-        if not directed:
-            g.add_edge(v, u, weight=random.randint(min_weight, max_weight))
     return g
+
 
 
 class UnionFind:
